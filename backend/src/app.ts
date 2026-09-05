@@ -34,7 +34,11 @@ export function createApp(config: AppConfig) {
   const app = express();
 
   const searchHistoryService = new SearchHistoryService(config.prisma);
-  const subscriptionService = new SubscriptionService(config.prisma);
+  const subscriptionService = new SubscriptionService({
+    prisma: config.prisma,
+    stripe: config.stripe,
+    priceId: config.stripePriceId,
+  });
   const foodFactsService = new OpenFoodFactsService(config.openFoodFactsBaseUrl);
   const productSearchService = new ProductSearchService({
     foodFactsService,

@@ -15,10 +15,13 @@ export class StripeCheckoutService {
 
   async createCheckoutSession(user: { id: string; email: string }) {
     try {
+      const successUrl = new URL(this.dependencies.successPath, this.dependencies.frontendUrl);
+      const separator = successUrl.search ? "&" : "?";
+
       const session = await this.dependencies.stripe.checkout.sessions.create({
         mode: "subscription",
         customer_email: user.email,
-        success_url: new URL(this.dependencies.successPath, this.dependencies.frontendUrl).toString(),
+        success_url: `${successUrl.toString()}${separator}session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: new URL(this.dependencies.cancelPath, this.dependencies.frontendUrl).toString(),
         line_items: [
           {
@@ -29,6 +32,12 @@ export class StripeCheckoutService {
         metadata: {
           demoUserId: user.id,
           demoUserEmail: user.email,
+        },
+        subscription_data: {
+          metadata: {
+            demoUserId: user.id,
+            demoUserEmail: user.email,
+          },
         },
       });
 

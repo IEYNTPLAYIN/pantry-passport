@@ -36,6 +36,8 @@ describe("product routes", () => {
           status: "CANCELED",
           isActive: false,
           canAccessNutrition: false,
+          cancelAtPeriodEnd: false,
+          currentPeriodEnd: null,
         }),
       },
     })));

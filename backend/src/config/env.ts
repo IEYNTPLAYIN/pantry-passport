@@ -11,9 +11,15 @@ const envSchema = z.object({
   OPEN_FOOD_FACTS_BASE_URL: z.string().url().default("https://world.openfoodfacts.org"),
   DEMO_USER_EMAIL: z.string().email(),
   DEMO_USER_NAME: z.string().min(1).default("Demo User"),
-  STRIPE_SECRET_KEY: z.string().min(1),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1),
-  STRIPE_PRICE_ID: z.string().min(1),
+  STRIPE_SECRET_KEY: z
+    .string()
+    .startsWith("sk_test_", "STRIPE_SECRET_KEY must be a Stripe test secret key starting with sk_test_."),
+  STRIPE_WEBHOOK_SECRET: z
+    .string()
+    .startsWith("whsec_", "STRIPE_WEBHOOK_SECRET must be a webhook signing secret starting with whsec_."),
+  STRIPE_PRICE_ID: z
+    .string()
+    .startsWith("price_", "STRIPE_PRICE_ID must be a recurring Stripe Price ID starting with price_."),
   STRIPE_SUCCESS_PATH: z.string().min(1).default("/subscription/success"),
   STRIPE_CANCEL_PATH: z.string().min(1).default("/subscription/cancel"),
 });

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import { asyncHandler } from "../lib/http.js";
 import type { StripeCheckoutService } from "../services/stripe-checkout.service.js";
@@ -9,6 +10,9 @@ export function createSubscriptionRoutes(
   stripeCheckoutService: StripeCheckoutService,
 ) {
   const router = Router();
+  const syncRequestSchema = z.object({
+    checkoutSessionId: z.string().startsWith("cs_").optional(),
+  });
 
   router.get(
     "/status",
@@ -27,6 +31,29 @@ export function createSubscriptionRoutes(
       });
 
       response.status(201).json(session);
+    }),
+  );
+
+  router.post(
+    "/sync",
+    asyncHandler(async (request, response) => {
+      const input = syncRequestSchema.parse(request.body);
+      const summary = await subscriptionService.syncFromStripe(
+        { id: request.demoUser!.id, email: request.demoUser!.email },
+        input.checkoutSessionId,
+      );
+      response.json(summary);
+    }),
+  );
+
+  router.post(
+    "/cancel",
+    asyncHandler(async (request, response) => {
+      const summary = await subscriptionService.cancelAtPeriodEnd({
+        id: request.demoUser!.id,
+        email: request.demoUser!.email,
+      });
+      response.json(summary);
     }),
   );
 

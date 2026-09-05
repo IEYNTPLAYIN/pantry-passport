@@ -44,12 +44,6 @@ export type RecentSearch = {
   createdAt: string;
 };
 
-export type SubscriptionSummary = {
-  status: string;
-  isActive: boolean;
-  canAccessNutrition: boolean;
-};
-
 export type TranslationShape = {
   appName: string;
   statusActive: string;
@@ -70,6 +64,12 @@ export type TranslationShape = {
   lockedTitle: string;
   lockedBody: string;
   subscribe: string;
+  cancelSubscription: string;
+  cancelSubscriptionConfirm: string;
+  confirmCancellation: string;
+  keepSubscription: string;
+  cancelling: string;
+  cancellationScheduled: string;
   subscriptionCtaTitle: string;
   subscriptionCtaBody: string;
   subscriptionSuccessEyebrow: string;
