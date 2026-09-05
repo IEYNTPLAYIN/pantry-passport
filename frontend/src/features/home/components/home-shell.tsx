@@ -2,6 +2,7 @@
 
 import { startTransition, useState } from "react";
 
+import { LanguageSelector } from "@/features/home";
 import { ProductCard, useProductSearch } from "@/features/products";
 import { RecentSearches, useRecentSearches } from "@/features/searches";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/features/subscription";
 import type { CheckoutResponse } from "@/features/subscription";
 import { ApiClientError, apiRequest } from "@/shared/api";
-import { supportedLanguages } from "@/shared/constants";
 import { getTranslations, useStoredLanguage } from "@/shared/i18n";
 import type { Product, SupportedLanguage } from "@/types";
 
@@ -104,7 +104,8 @@ export function HomeShell() {
           <div className="min-w-0">
             <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-meadow">
+                <LanguageSelector value={language} onChange={onLanguageChange} />
+                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-meadow">
                   {t.heroEyebrow}
                 </p>
                 <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight md:text-5xl">
@@ -132,23 +133,6 @@ export function HomeShell() {
             <p className="mt-6 max-w-3xl text-lg leading-8 text-ink/75">
               {t.heroBody}
             </p>
-
-            <div className="mt-8 flex flex-wrap gap-2" aria-label="Language selection">
-              {supportedLanguages.map((entry) => (
-                <button
-                  key={entry}
-                  type="button"
-                  onClick={() => onLanguageChange(entry)}
-                  className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-meadow ${
-                    language === entry
-                      ? "bg-ink text-white"
-                      : "bg-canvas text-ink hover:bg-oat/50"
-                  }`}
-                >
-                  {entry}
-                </button>
-              ))}
-            </div>
 
             <form
               className="mt-8 flex flex-col gap-4 md:flex-row"
