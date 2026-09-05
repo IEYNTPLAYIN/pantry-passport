@@ -1,2 +1,2 @@
-export { supportedLanguages } from "./language";
-export { queryKeys } from "./query-keys";
+export { supportedLanguages } from './language'
+export { queryKeys } from './query-keys'

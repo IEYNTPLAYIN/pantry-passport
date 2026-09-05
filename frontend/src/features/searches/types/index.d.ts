@@ -1,14 +1,14 @@
-import type { RecentSearch } from "@/types";
+import type { RecentSearch } from '@/types'
 
 export type RecentSearchResponse = {
-  searches: RecentSearch[];
-};
+  searches: RecentSearch[]
+}
 
 export type RecentSearchesProps = {
-  emptyLabel: string;
-  heading: string;
-  onSelectSearch: (query: string) => void;
-  searches: RecentSearch[];
-};
+  emptyLabel: string
+  heading: string
+  onSelectSearch: (query: string) => void
+  searches: RecentSearch[]
+}
 
-export type { RecentSearch };
+export type { RecentSearch }
