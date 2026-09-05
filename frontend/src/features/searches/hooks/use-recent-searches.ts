@@ -10,5 +10,6 @@ export function useRecentSearches() {
   return useQuery({
     queryKey: queryKeys.recentSearches,
     queryFn: () => apiRequest<RecentSearchResponse>("/api/searches/recent?limit=6"),
+    meta: { persist: true },
   });
 }

@@ -10,5 +10,6 @@ export function useSubscriptionStatus() {
   return useQuery({
     queryKey: queryKeys.subscriptionStatus,
     queryFn: () => apiRequest<SubscriptionSummary>("/api/subscription/status"),
+    meta: { persist: true },
   });
 }

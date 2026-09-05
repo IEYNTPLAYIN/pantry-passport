@@ -15,3 +15,10 @@ export type SubscribeButtonProps = {
   label: string;
   onClick: () => void;
 };
+
+export type PremiumAccessLinkProps = {
+  isActive: boolean;
+  isLoading: boolean;
+  activateLabel: string;
+  crownLabel: string;
+};

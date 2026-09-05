@@ -1,132 +1,93 @@
-"use client";
+'use client'
 
-import { startTransition, useState } from "react";
+import { useRouter } from 'next/navigation'
+import { startTransition, useState } from 'react'
 
-import { LanguageSelector } from "@/features/home";
-import { ProductCard, useProductSearch } from "@/features/products";
-import { RecentSearches, useRecentSearches } from "@/features/searches";
+import { LanguageSelector } from '@/features/home'
+import { ProductCard, useProductSearch } from '@/features/products'
+import { RecentSearches, useRecentSearches } from '@/features/searches'
 import {
-  SubscribeButton,
-  useCancelSubscription,
+  PremiumAccessLink,
   useSubscriptionStatus,
-} from "@/features/subscription";
-import type { CheckoutResponse } from "@/features/subscription";
-import { ApiClientError, apiRequest } from "@/shared/api";
-import { getTranslations, useStoredLanguage } from "@/shared/i18n";
-import type { Product, SupportedLanguage } from "@/types";
+} from '@/features/subscription'
+import { ApiClientError } from '@/shared/api'
+import { getTranslations, useStoredLanguage } from '@/shared/i18n'
+import type { Product, SupportedLanguage } from '@/types'
 
 export function HomeShell() {
-  const [language, setLanguage] = useStoredLanguage();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [checkoutPending, setCheckoutPending] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [language, setLanguage] = useStoredLanguage()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [results, setResults] = useState<Product[]>([])
+  const [hasSearched, setHasSearched] = useState(false)
+  const [showRecentSearches, setShowRecentSearches] = useState(false)
 
-  const t = getTranslations(language);
-  const searchMutation = useProductSearch();
-  const recentSearches = useRecentSearches();
-  const subscriptionStatus = useSubscriptionStatus();
-  const cancelSubscription = useCancelSubscription();
+  const router = useRouter()
+  const t = getTranslations(language)
+  const searchMutation = useProductSearch()
+  const recentSearches = useRecentSearches()
+  const subscriptionStatus = useSubscriptionStatus()
 
   async function runSearch(query: string) {
-    setHasSearched(true);
-    const trimmedQuery = query.trim();
+    setHasSearched(true)
+    const trimmedQuery = query.trim()
 
     if (!trimmedQuery) {
-      searchMutation.reset();
-      setResults([]);
-      return;
+      searchMutation.reset()
+      setResults([])
+      return
     }
 
     try {
       const response = await searchMutation.mutateAsync({
         query: trimmedQuery,
         language,
-      });
-      setResults(response.products);
+      })
+      setResults(response.products)
     } catch {
-      setResults([]);
-    }
-  }
-
-  async function startCheckout() {
-    try {
-      setCheckoutPending(true);
-      setCheckoutError(null);
-
-      const response = await apiRequest<CheckoutResponse>(
-        "/api/subscription/checkout",
-        {
-          method: "POST",
-          body: JSON.stringify({}),
-        },
-      );
-
-      window.location.assign(response.checkoutUrl);
-    } catch (error) {
-      setCheckoutError(
-        error instanceof ApiClientError ? error.message : t.errorTitle,
-      );
-    } finally {
-      setCheckoutPending(false);
-    }
-  }
-
-  async function cancelRenewal() {
-    setCheckoutError(null);
-    try {
-      await cancelSubscription.mutateAsync();
-      setShowCancelConfirmation(false);
-    } catch (error) {
-      setCheckoutError(error instanceof ApiClientError ? error.message : t.errorTitle);
+      setResults([])
     }
   }
 
   function onLanguageChange(nextLanguage: SupportedLanguage) {
     startTransition(() => {
-      setLanguage(nextLanguage);
-    });
+      setLanguage(nextLanguage)
+    })
   }
 
-  const hasResults = results.length > 0;
+  const hasResults = results.length > 0
   const showEmptyState =
     hasSearched &&
     !searchMutation.isPending &&
     !searchMutation.isError &&
-    !hasResults;
+    !hasResults
 
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-12">
-      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/80 shadow-soft backdrop-blur-md">
-        <div className="grid gap-8 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.65fr)] lg:gap-10 lg:p-10">
+      <section className="relative z-30 overflow-visible rounded-[2rem] border border-white/70 bg-white/80 shadow-soft backdrop-blur-md">
+        <div className="p-5 sm:p-7 lg:p-10">
           <div className="min-w-0">
-            <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <LanguageSelector value={language} onChange={onLanguageChange} />
-                <p className="mt-5 text-sm font-semibold uppercase tracking-[0.22em] text-meadow">
+            <header>
+              <div className="ml-auto flex w-full items-center justify-end gap-3 sm:w-auto">
+                <div className="min-w-0 flex-1 sm:flex-none">
+                  <LanguageSelector
+                    value={language}
+                    onChange={onLanguageChange}
+                  />
+                </div>
+                <PremiumAccessLink
+                  isActive={subscriptionStatus.data?.isActive === true}
+                  isLoading={subscriptionStatus.isPending}
+                  activateLabel={t.activatePremium}
+                  crownLabel={t.premiumLinkLabel}
+                />
+              </div>
+              <div className="mt-7">
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-meadow">
                   {t.heroEyebrow}
                 </p>
                 <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight md:text-5xl">
                   {t.heroTitle}
                 </h1>
-              </div>
-              <div className="shrink-0 space-y-3 sm:max-w-52">
-                <div className="rounded-full border border-oat/50 bg-canvas px-4 py-2 text-center text-sm font-semibold">
-                  {t.appName}
-                </div>
-                <div
-                  className={`rounded-2xl px-4 py-3 text-sm font-medium shadow-sm ${
-                    subscriptionStatus.data?.isActive
-                      ? "bg-meadow text-white"
-                      : "bg-oat/40 text-ink"
-                  }`}
-                >
-                  {subscriptionStatus.data?.isActive
-                    ? t.statusActive
-                    : t.statusInactive}
-                </div>
               </div>
             </header>
 
@@ -135,102 +96,65 @@ export function HomeShell() {
             </p>
 
             <form
-              className="mt-8 flex flex-col gap-4 md:flex-row"
+              className="relative z-50 mt-8 w-full max-w-full"
               onSubmit={(event) => {
-                event.preventDefault();
-                void runSearch(searchTerm);
+                event.preventDefault()
+                setShowRecentSearches(false)
+                void runSearch(searchTerm)
+              }}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setShowRecentSearches(false)
+                }
               }}
             >
-              <input
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                aria-label={t.searchPlaceholder}
-                placeholder={t.searchPlaceholder}
-                className="min-h-14 min-w-0 flex-1 rounded-full border border-oat/60 bg-canvas px-5 text-base text-ink outline-none transition placeholder:text-ink/45 focus:border-meadow focus:ring-4 focus:ring-meadow/10"
-              />
-              <button
-                type="submit"
-                disabled={searchMutation.isPending}
-                className="min-h-14 rounded-full bg-meadow px-6 font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-meadow/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-meadow disabled:cursor-not-allowed disabled:opacity-60 md:min-w-44"
-              >
-                {searchMutation.isPending ? t.loading : t.searchButton}
-              </button>
+              <div className="rounded-full border border-oat/65 bg-canvas shadow-sm transition hover:border-meadow/45 hover:shadow-md focus-within:border-meadow focus-within:bg-white focus-within:shadow-[0_12px_35px_rgba(25,54,45,0.1)] focus-within:ring-4 focus-within:ring-meadow/10">
+                <div className="flex min-h-16 items-center px-5">
+                  {searchMutation.isPending ? (
+                    <span className="mr-4 size-5 shrink-0 animate-spin rounded-full border-2 border-meadow/25 border-t-meadow" aria-hidden="true" />
+                  ) : (
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="mr-4 size-5 shrink-0 text-meadow">
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="m16.2 16.2 4 4" strokeLinecap="round" />
+                    </svg>
+                  )}
+                  <input
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    aria-label={t.searchPlaceholder}
+                    placeholder={t.searchPlaceholder}
+                    autoComplete="off"
+                    onFocus={() => setShowRecentSearches(true)}
+                    onPointerDown={() => setShowRecentSearches(true)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") {
+                        setShowRecentSearches(false)
+                        event.currentTarget.blur()
+                      }
+                    }}
+                    className="min-h-16 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink/40"
+                  />
+                  <span className="ml-3 hidden rounded-lg border border-oat/70 bg-white px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-ink/40 sm:inline">Enter</span>
+                </div>
+              </div>
+              {showRecentSearches ? (
+                <RecentSearches
+                  heading={t.recentSearches}
+                  emptyLabel={t.recentSearchesEmpty}
+                  searches={recentSearches.data?.searches ?? []}
+                  onSelectSearch={(query) => {
+                    setSearchTerm(query)
+                    setShowRecentSearches(false)
+                    void runSearch(query)
+                  }}
+                />
+              ) : null}
             </form>
           </div>
-
-          <aside className="relative isolate overflow-hidden rounded-card border border-white/10 bg-ink p-6 text-white shadow-soft sm:p-7">
-            <div className="pointer-events-none absolute -right-16 -top-20 -z-10 size-52 rounded-full bg-peach/20 blur-2xl" />
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-white/70">
-              {t.subscriptionCtaTitle}
-            </p>
-            <p className="mt-4 text-lg leading-8 text-white/85">
-              {t.subscriptionCtaBody}
-            </p>
-            <div className="mt-8">
-              {subscriptionStatus.data?.isActive ? (
-                subscriptionStatus.data.cancelAtPeriodEnd ? (
-                  <p className="rounded-2xl border border-white/15 bg-white/10 p-4 text-sm leading-6 text-white/85">
-                    {t.cancellationScheduled.replace(
-                      "{date}",
-                      subscriptionStatus.data.currentPeriodEnd
-                        ? new Intl.DateTimeFormat(language, { dateStyle: "long" }).format(
-                            new Date(subscriptionStatus.data.currentPeriodEnd),
-                          )
-                        : "-",
-                    )}
-                  </p>
-                ) : showCancelConfirmation ? (
-                  <div className="rounded-2xl border border-white/15 bg-white/10 p-4">
-                    <p className="text-sm leading-6 text-white/85">{t.cancelSubscriptionConfirm}</p>
-                    <div className="mt-4 flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        disabled={cancelSubscription.isPending}
-                        onClick={() => void cancelRenewal()}
-                        className="min-h-11 rounded-full bg-peach px-4 py-2 text-sm font-semibold text-white transition hover:bg-peach/90 disabled:opacity-60"
-                      >
-                        {cancelSubscription.isPending ? t.cancelling : t.confirmCancellation}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={cancelSubscription.isPending}
-                        onClick={() => setShowCancelConfirmation(false)}
-                        className="min-h-11 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
-                      >
-                        {t.keepSubscription}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowCancelConfirmation(true)}
-                    className="min-h-12 rounded-full border border-white/35 px-5 py-3 font-semibold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  >
-                    {t.cancelSubscription}
-                  </button>
-                )
-              ) : (
-                <SubscribeButton
-                  disabled={checkoutPending}
-                  label={t.subscribe}
-                  onClick={() => void startCheckout()}
-                />
-              )}
-            </div>
-            {!subscriptionStatus.data?.isActive ? (
-              <p className="mt-4 text-sm leading-6 text-white/70">
-                {t.activationPending}
-              </p>
-            ) : null}
-            {checkoutError ? (
-              <p className="mt-4 text-sm text-[#ffd3c0]">{checkoutError}</p>
-            ) : null}
-          </aside>
         </div>
       </section>
 
-      <section className="mt-6 grid items-start gap-6 lg:mt-8 xl:grid-cols-[minmax(0,1.5fr)_minmax(18rem,0.7fr)] xl:gap-8">
+      <section className="relative z-0 mt-6 lg:mt-8">
         <div className="space-y-6">
           {searchMutation.isError ? (
             <div className="rounded-card border border-[#efc1a8] bg-[#fff7f2] p-6 shadow-soft">
@@ -258,7 +182,7 @@ export function HomeShell() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onSubscribe={() => void startCheckout()}
+                  onSubscribe={() => router.push('/subscription')}
                   labels={{
                     noImage: t.noImage,
                     nutritionTitle: t.nutritionTitle,
@@ -272,17 +196,7 @@ export function HomeShell() {
             </div>
           ) : null}
         </div>
-
-        <RecentSearches
-          heading={t.recentSearches}
-          emptyLabel={t.recentSearchesEmpty}
-          searches={recentSearches.data?.searches ?? []}
-          onSelectSearch={(query) => {
-            setSearchTerm(query);
-            void runSearch(query);
-          }}
-        />
       </section>
     </main>
-  );
+  )
 }

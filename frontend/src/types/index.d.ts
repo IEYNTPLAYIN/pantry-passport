@@ -48,6 +48,8 @@ export type TranslationShape = {
   appName: string;
   statusActive: string;
   statusInactive: string;
+  activatePremium: string;
+  premiumLinkLabel: string;
   heroEyebrow: string;
   heroTitle: string;
   heroBody: string;
