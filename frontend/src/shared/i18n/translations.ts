@@ -1,0 +1,198 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { supportedLanguages } from "@/shared/constants";
+import type { SupportedLanguage, TranslationShape } from "@/types";
+
+const storageKey = "pantry-passport.language";
+
+const translations: Record<SupportedLanguage, TranslationShape> = {
+  en: {
+    appName: "Pantry Passport",
+    statusActive: "Premium nutrition unlocked",
+    statusInactive: "Nutrition details require premium",
+    heroEyebrow: "Open Food Facts search",
+    heroTitle: "Find packaged foods without exposing the external API in the browser.",
+    heroBody: "Search by product title, food name, or a general term. Nutrition data is unlocked only after Stripe confirms an active subscription for the demo user.",
+    searchPlaceholder: "Search for pasta, granola, chocolate milk...",
+    searchButton: "Search products",
+    recentSearches: "Recent searches",
+    recentSearchesEmpty: "Recent searches will appear here after successful lookups.",
+    loading: "Searching products...",
+    emptyTitle: "No products matched that search.",
+    emptyBody: "Try a broader food name or a different spelling.",
+    errorTitle: "We could not load products right now.",
+    noImage: "No image available",
+    nutritionTitle: "Nutrition per 100g",
+    lockedTitle: "Premium nutrition preview",
+    lockedBody: "The backend is withholding detailed nutrition values until the demo user has an active Stripe subscription.",
+    subscribe: "Subscribe monthly",
+    subscriptionCtaTitle: "Unlock full nutrition details",
+    subscriptionCtaBody: "Start the Stripe test-mode subscription to reveal detailed nutrition values on every search result.",
+    subscriptionSuccessEyebrow: "Checkout completed",
+    subscriptionSuccessTitle: "Your subscription is being activated.",
+    subscriptionSuccessBody: "Stripe has redirected you back successfully. If the webhook is still processing, the premium badge may take a moment to switch on.",
+    subscriptionCancelEyebrow: "Checkout canceled",
+    subscriptionCancelTitle: "No changes were made to the subscription.",
+    subscriptionCancelBody: "You can return to search products and start checkout again whenever you are ready.",
+    backHome: "Back to search",
+    activationPending: "Subscription status updates after Stripe webhooks finish syncing.",
+    nutritionLabels: {
+      energyKcal: "Energy (kcal)",
+      fat: "Fat",
+      saturatedFat: "Saturated fat",
+      carbohydrates: "Carbohydrates",
+      sugars: "Sugars",
+      fiber: "Fiber",
+      proteins: "Proteins",
+      salt: "Salt",
+    },
+  },
+  nl: {
+    appName: "Pantry Passport",
+    statusActive: "Premium voeding ontgrendeld",
+    statusInactive: "Voedingsdetails vereisen premium",
+    heroEyebrow: "Open Food Facts zoeken",
+    heroTitle: "Vind verpakte voedingsmiddelen zonder de externe API in de browser bloot te stellen.",
+    heroBody: "Zoek op producttitel, voedingsnaam of algemene term. Voedingsgegevens worden pas zichtbaar nadat Stripe een actief abonnement voor de demo-gebruiker bevestigt.",
+    searchPlaceholder: "Zoek naar pasta, granola, chocolademelk...",
+    searchButton: "Producten zoeken",
+    recentSearches: "Recente zoekopdrachten",
+    recentSearchesEmpty: "Recente zoekopdrachten verschijnen hier na succesvolle zoekacties.",
+    loading: "Producten worden gezocht...",
+    emptyTitle: "Geen producten gevonden voor deze zoekopdracht.",
+    emptyBody: "Probeer een algemenere voedingsnaam of een andere spelling.",
+    errorTitle: "We konden de producten nu niet laden.",
+    noImage: "Geen afbeelding beschikbaar",
+    nutritionTitle: "Voeding per 100 g",
+    lockedTitle: "Premium voedingsvoorbeeld",
+    lockedBody: "De backend houdt gedetailleerde voedingswaarden achter totdat de demo-gebruiker een actief Stripe-abonnement heeft.",
+    subscribe: "Maandelijks abonneren",
+    subscriptionCtaTitle: "Ontgrendel volledige voedingsdetails",
+    subscriptionCtaBody: "Start het Stripe-testabonnement om gedetailleerde voedingswaarden in elk zoekresultaat te tonen.",
+    subscriptionSuccessEyebrow: "Checkout voltooid",
+    subscriptionSuccessTitle: "Je abonnement wordt geactiveerd.",
+    subscriptionSuccessBody: "Stripe heeft je succesvol teruggestuurd. Als de webhook nog verwerkt wordt, kan de premiumstatus even op zich laten wachten.",
+    subscriptionCancelEyebrow: "Checkout geannuleerd",
+    subscriptionCancelTitle: "Er zijn geen wijzigingen aangebracht aan het abonnement.",
+    subscriptionCancelBody: "Je kunt teruggaan om producten te zoeken en later opnieuw afrekenen.",
+    backHome: "Terug naar zoeken",
+    activationPending: "De abonnementsstatus wordt bijgewerkt nadat Stripe-webhooks zijn gesynchroniseerd.",
+    nutritionLabels: {
+      energyKcal: "Energie (kcal)",
+      fat: "Vet",
+      saturatedFat: "Verzadigd vet",
+      carbohydrates: "Koolhydraten",
+      sugars: "Suikers",
+      fiber: "Vezels",
+      proteins: "Eiwitten",
+      salt: "Zout",
+    },
+  },
+  de: {
+    appName: "Pantry Passport",
+    statusActive: "Premium-Naehrwerte freigeschaltet",
+    statusInactive: "Naehrwertdetails erfordern Premium",
+    heroEyebrow: "Open Food Facts Suche",
+    heroTitle: "Finde verpackte Lebensmittel, ohne die externe API im Browser offenzulegen.",
+    heroBody: "Suche nach Produkttitel, Lebensmittelname oder einem allgemeinen Begriff. Naehrwertdaten werden erst sichtbar, wenn Stripe ein aktives Abo fuer den Demo-Benutzer bestaetigt.",
+    searchPlaceholder: "Suche nach Pasta, Granola, Schokomilch...",
+    searchButton: "Produkte suchen",
+    recentSearches: "Letzte Suchanfragen",
+    recentSearchesEmpty: "Erfolgreiche Suchanfragen erscheinen hier.",
+    loading: "Produkte werden gesucht...",
+    emptyTitle: "Keine Produkte fuer diese Suche gefunden.",
+    emptyBody: "Versuche einen allgemeineren Begriff oder eine andere Schreibweise.",
+    errorTitle: "Produkte konnten gerade nicht geladen werden.",
+    noImage: "Kein Bild verfuegbar",
+    nutritionTitle: "Naehrwerte pro 100 g",
+    lockedTitle: "Premium-Naehrwertvorschau",
+    lockedBody: "Das Backend haelt detaillierte Naehrwerte zurueck, bis der Demo-Benutzer ein aktives Stripe-Abo hat.",
+    subscribe: "Monatlich abonnieren",
+    subscriptionCtaTitle: "Volle Naehrwertdetails freischalten",
+    subscriptionCtaBody: "Starte das Stripe-Testabo, um detaillierte Naehrwerte in jedem Suchergebnis zu sehen.",
+    subscriptionSuccessEyebrow: "Checkout abgeschlossen",
+    subscriptionSuccessTitle: "Dein Abo wird aktiviert.",
+    subscriptionSuccessBody: "Stripe hat erfolgreich zurueckgeleitet. Wenn der Webhook noch laeuft, kann das Premium-Abzeichen kurz spaeter erscheinen.",
+    subscriptionCancelEyebrow: "Checkout abgebrochen",
+    subscriptionCancelTitle: "Am Abo wurden keine Aenderungen vorgenommen.",
+    subscriptionCancelBody: "Du kannst zur Produktsuche zurueckkehren und spaeter erneut starten.",
+    backHome: "Zurueck zur Suche",
+    activationPending: "Der Abo-Status wird aktualisiert, sobald die Stripe-Webhooks synchronisiert sind.",
+    nutritionLabels: {
+      energyKcal: "Energie (kcal)",
+      fat: "Fett",
+      saturatedFat: "Gesättigte Fettsaeuren",
+      carbohydrates: "Kohlenhydrate",
+      sugars: "Zucker",
+      fiber: "Ballaststoffe",
+      proteins: "Eiweiss",
+      salt: "Salz",
+    },
+  },
+  fr: {
+    appName: "Pantry Passport",
+    statusActive: "Nutrition premium debloquee",
+    statusInactive: "Les details nutritionnels exigent le premium",
+    heroEyebrow: "Recherche Open Food Facts",
+    heroTitle: "Trouvez des produits alimentaires emballes sans exposer l'API externe dans le navigateur.",
+    heroBody: "Recherchez par titre, nom d'aliment ou terme general. Les donnees nutritionnelles ne sont debloquees qu'apres confirmation Stripe d'un abonnement actif pour l'utilisateur demo.",
+    searchPlaceholder: "Rechercher des pates, du granola, du lait chocolate...",
+    searchButton: "Rechercher des produits",
+    recentSearches: "Recherches recentes",
+    recentSearchesEmpty: "Les recherches recentes apparaitront ici apres des requetes reussies.",
+    loading: "Recherche des produits...",
+    emptyTitle: "Aucun produit ne correspond a cette recherche.",
+    emptyBody: "Essayez un terme plus large ou une orthographe differente.",
+    errorTitle: "Impossible de charger les produits pour le moment.",
+    noImage: "Aucune image disponible",
+    nutritionTitle: "Nutrition pour 100 g",
+    lockedTitle: "Apercu nutrition premium",
+    lockedBody: "Le backend masque les valeurs nutritionnelles detaillees tant que l'utilisateur demo n'a pas un abonnement Stripe actif.",
+    subscribe: "Souscrire mensuellement",
+    subscriptionCtaTitle: "Debloquer la nutrition complete",
+    subscriptionCtaBody: "Demarrez l'abonnement Stripe en mode test pour afficher les valeurs nutritionnelles detaillees sur chaque resultat.",
+    subscriptionSuccessEyebrow: "Paiement termine",
+    subscriptionSuccessTitle: "Votre abonnement est en cours d'activation.",
+    subscriptionSuccessBody: "Stripe vous a redirige avec succes. Si le webhook est encore en cours, le badge premium peut prendre un instant.",
+    subscriptionCancelEyebrow: "Paiement annule",
+    subscriptionCancelTitle: "Aucune modification n'a ete apportee a l'abonnement.",
+    subscriptionCancelBody: "Vous pouvez revenir a la recherche et relancer le paiement plus tard.",
+    backHome: "Retour a la recherche",
+    activationPending: "Le statut de l'abonnement se met a jour apres la synchronisation des webhooks Stripe.",
+    nutritionLabels: {
+      energyKcal: "Energie (kcal)",
+      fat: "Lipides",
+      saturatedFat: "Acides gras satures",
+      carbohydrates: "Glucides",
+      sugars: "Sucres",
+      fiber: "Fibres",
+      proteins: "Proteines",
+      salt: "Sel",
+    },
+  },
+};
+
+export function getTranslations(language: SupportedLanguage) {
+  return translations[language];
+}
+
+export function useStoredLanguage() {
+  const [language, setLanguage] = useState<SupportedLanguage>("en");
+
+  useEffect(() => {
+    const savedValue = window.localStorage.getItem(storageKey);
+    if (savedValue && supportedLanguages.includes(savedValue as SupportedLanguage)) {
+      setLanguage(savedValue as SupportedLanguage);
+      document.documentElement.lang = savedValue;
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, language);
+    document.documentElement.lang = language;
+  }, [language]);
+
+  return [language, setLanguage] as const;
+}
