@@ -1,2 +1,3 @@
 export { HomeShell } from "./components/home-shell";
-export type { HomeShellProps } from "./types";
+export { LanguageSelector } from "./components/language-selector";
+export type { HomeShellProps, LanguageSelectorProps } from "./types";
