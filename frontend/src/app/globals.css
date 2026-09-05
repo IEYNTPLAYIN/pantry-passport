@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme inline {
   --color-canvas: #f6f1e5;
@@ -9,7 +9,7 @@
   --color-peach: #ef9f6c;
   --radius-card: 1.5rem;
   --shadow-soft: 0 20px 60px rgba(18, 53, 36, 0.12);
-  --font-sans: var(--font-manrope), "Avenir Next", sans-serif;
+  --font-sans: var(--font-manrope), 'Avenir Next', sans-serif;
 }
 
 * {
@@ -19,7 +19,11 @@
 html {
   min-width: 320px;
   background:
-    radial-gradient(circle at top left, rgba(239, 159, 108, 0.22), transparent 30%),
+    radial-gradient(
+      circle at top left,
+      rgba(239, 159, 108, 0.22),
+      transparent 30%
+    ),
     linear-gradient(135deg, #f9f5ec 0%, #f1ead8 50%, #efe5cf 100%);
   color: var(--color-ink);
 }

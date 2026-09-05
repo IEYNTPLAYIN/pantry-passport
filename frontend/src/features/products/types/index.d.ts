@@ -1,23 +1,23 @@
-import type { Product, ProductSearchResponse, SupportedLanguage } from "@/types";
+import type { Product, ProductSearchResponse, SupportedLanguage } from '@/types'
 
 export type ProductSearchVariables = {
-  query: string;
-  language: SupportedLanguage;
-};
+  query: string
+  language: SupportedLanguage
+}
 
 export type ProductCardLabels = {
-  noImage: string;
-  nutritionTitle: string;
-  lockedTitle: string;
-  lockedBody: string;
-  subscribe: string;
-  nutritionLabels: Record<string, string>;
-};
+  noImage: string
+  nutritionTitle: string
+  lockedTitle: string
+  lockedBody: string
+  subscribe: string
+  nutritionLabels: Record<string, string>
+}
 
 export type ProductCardProps = {
-  labels: ProductCardLabels;
-  onSubscribe: () => void;
-  product: Product;
-};
+  labels: ProductCardLabels
+  onSubscribe: () => void
+  product: Product
+}
 
-export type { Product, ProductSearchResponse };
+export type { Product, ProductSearchResponse }

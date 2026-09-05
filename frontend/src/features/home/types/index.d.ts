@@ -1,8 +1,8 @@
-import type { SupportedLanguage } from "@/types";
+import type { SupportedLanguage } from '@/types'
 
-export type HomeShellProps = Record<string, never>;
+export type HomeShellProps = Record<string, never>
 
 export type LanguageSelectorProps = {
-  value: SupportedLanguage;
-  onChange: (language: SupportedLanguage) => void;
-};
+  value: SupportedLanguage
+  onChange: (language: SupportedLanguage) => void
+}

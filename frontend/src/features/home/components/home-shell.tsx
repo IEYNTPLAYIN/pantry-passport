@@ -111,9 +111,19 @@ export function HomeShell() {
               <div className="rounded-full border border-oat/65 bg-canvas shadow-sm transition hover:border-meadow/45 hover:shadow-md focus-within:border-meadow focus-within:bg-white focus-within:shadow-[0_12px_35px_rgba(25,54,45,0.1)] focus-within:ring-4 focus-within:ring-meadow/10">
                 <div className="flex min-h-16 items-center px-5">
                   {searchMutation.isPending ? (
-                    <span className="mr-4 size-5 shrink-0 animate-spin rounded-full border-2 border-meadow/25 border-t-meadow" aria-hidden="true" />
+                    <span
+                      className="mr-4 size-5 shrink-0 animate-spin rounded-full border-2 border-meadow/25 border-t-meadow"
+                      aria-hidden="true"
+                    />
                   ) : (
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="mr-4 size-5 shrink-0 text-meadow">
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="mr-4 size-5 shrink-0 text-meadow"
+                    >
                       <circle cx="11" cy="11" r="7" />
                       <path d="m16.2 16.2 4 4" strokeLinecap="round" />
                     </svg>
@@ -127,14 +137,16 @@ export function HomeShell() {
                     onFocus={() => setShowRecentSearches(true)}
                     onPointerDown={() => setShowRecentSearches(true)}
                     onKeyDown={(event) => {
-                      if (event.key === "Escape") {
+                      if (event.key === 'Escape') {
                         setShowRecentSearches(false)
                         event.currentTarget.blur()
                       }
                     }}
                     className="min-h-16 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink/40"
                   />
-                  <span className="ml-3 hidden rounded-lg border border-oat/70 bg-white px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-ink/40 sm:inline">Enter</span>
+                  <span className="ml-3 hidden rounded-lg border border-oat/70 bg-white px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-ink/40 sm:inline">
+                    Enter
+                  </span>
                 </div>
               </div>
               {showRecentSearches ? (

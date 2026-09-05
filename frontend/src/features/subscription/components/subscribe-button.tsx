@@ -1,4 +1,4 @@
-import type { SubscribeButtonProps } from "@/features/subscription";
+import type { SubscribeButtonProps } from '@/features/subscription'
 
 export function SubscribeButton({
   disabled = false,
@@ -14,5 +14,5 @@ export function SubscribeButton({
     >
       {label}
     </button>
-  );
+  )
 }

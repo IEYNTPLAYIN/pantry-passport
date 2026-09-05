@@ -1,5 +1,5 @@
-import { HomeShell } from "@/features/home";
+import { HomeShell } from '@/features/home'
 
 export default function HomePage() {
-  return <HomeShell />;
+  return <HomeShell />
 }
